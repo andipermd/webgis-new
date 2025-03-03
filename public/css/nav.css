@@ -1,0 +1,144 @@
+    .navbar {
+        padding: 15px 0px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: white;
+        transition: background-color 0.3s ease;
+        z-index: 1000000001;
+        color: black;
+    }
+
+    .navbar.scrolled {
+        background-color: #ffffff;
+    }
+
+    .navbar-brand {
+        color: #000000 !important;
+        font-weight: 700;
+    }
+
+    .nav-link {
+        color: #505050 !important;
+    }
+
+    .nav-link:hover {
+        color: #000000 !important;
+    }
+
+    .nav-link:active {
+        font-weight: bold;
+    }
+
+    #daftar {
+        display: flex;
+        gap: 6px;
+    }
+
+    .btn-register {
+        background-color: #28a745;
+        color: #fff;
+        border-radius: 20px;
+        padding: 8px 16px;
+        text-decoration: none;
+    }
+
+    .btn-register:hover {
+        background-color: #218838;
+    }
+
+    .btn-login {
+        background-color: #007bff;
+        color: #fff;
+        border-radius: 20px;
+        padding: 8px 16px;
+        text-decoration: none;
+    }
+
+    .btn-login:hover {
+        background-color: #0056b3;
+    }
+
+    .hamburger {
+        display: none;
+    }
+
+
+
+
+
+    @media (max-width: 991.98px) {
+
+        /* Hamburger menu */
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 24px;
+            width: 30px;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        .hamburger input {
+            position: absolute;
+            width: 40px;
+            height: 28px;
+            cursor: pointer;
+            opacity: 0;
+            z-index: 3;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background-color: white;
+            border-radius: 2px;
+            transition: all 0.4s ease;
+        }
+
+        .hamburger input:checked~span:nth-child(2) {
+            background-color: black;
+            transform: rotate(45deg) translateY(-1px);
+            transform-origin: 0 0;
+        }
+
+        .hamburger input:checked~span:nth-child(3) {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        .hamburger input:checked~span:last-child {
+            background-color: black;
+            transform: rotate(-45deg) translate(-2px, -1px);
+            transform-origin: 0 0;
+        }
+
+
+        #daftar {
+            display: none;
+        }
+
+
+        .navbar-collapse {
+            background-color: #6a11cb;
+            padding: 10px;
+            z-index: 2;
+        }
+
+        .nav-link {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        #navbarNav.show+#daftar {
+            background-color: #6a11cb;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: 10px 0px;
+
+        }
+    }

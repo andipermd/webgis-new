@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          Int    @id @default(autoincrement())
+  name        String
+  price       String
+  description String
+  image       String
+}
+
+model Batas_provinsi {
+  gid        Int                      @id @default(autoincrement())
+  objectid   Float?
+  provinsi   String?                  @db.VarChar(50)
+  shape_leng Decimal?                 @db.Decimal
+  shape_area Decimal?                 @db.Decimal
+  geom       Unsupported("geometry")?
+
+  @@index([geom], type: Gist)
+  @@map("Batas-provinsi")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}

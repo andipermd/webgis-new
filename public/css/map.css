@@ -1,0 +1,269 @@
+.mapContent {
+  display: grid;
+  grid-template-columns: 6% 94%;
+  height: 100vh; /* Agar tinggi penuh */
+}
+
+/* 
+    .sidebar {
+    background-color: #f4f4f4; 
+    padding: 90px 1rem 1rem 1rem;
+    border-right: 1px solid #ccc; 
+    overflow-y: auto; 
+} 
+*/
+.sidebar {
+  background-color: #009376;
+  padding-top: 70px;
+  border-right: 1px solid #ddd;
+  position: relative;
+  z-index: 100000000; /* Sidebar tetap di atas */
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.buttons p {
+  font-size: 11px;
+  color: #ffff;
+}
+
+.buttons i {
+  font-size: 40px;
+  color: #ffff;
+}
+
+.menu-btn {
+  width: 100%;
+  border: none;
+  border-bottom: 1px white solid;
+  cursor: pointer;
+  background: none;
+}
+
+.menu-btn:first-child {
+  font-size: 14px;
+  padding: 1rem 0px;
+  font-weight: bold;
+  color: #ffff;
+}
+
+.menu-btn:last-child {
+  border: none;
+  margin-top: 150px;
+}
+
+.menu-btn:hover {
+  background-color: #00866b;
+}
+
+.custom-menu {
+  margin-top: 90px;
+  position: absolute;
+  top: 0; /* Sesuaikan posisi agar muncul di samping tombol */
+  left: 100%; /* Muncul di samping kanan tombol */
+  margin-left: 10px; /* Jarak tambahan ke kanan */
+  opacity: 0;
+  transform: translateX(-100);
+  /* transform: scale(0.95);  */
+  display: none; /* Sembunyikan menu secara default */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  width: fit-content;
+  z-index: 5;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.dropdown-menu {
+  padding: 0;
+}
+
+.custom-menu.show {
+  display: block;
+  opacity: 1; /* Tampilkan */
+  /* transform: scale(1);  */
+  transform: translateX(0);
+}
+
+#menu1 {
+  width: 500px;
+}
+
+#menu2 {
+  width: 400px;
+  background-color: #009376;
+  color: #ffff;
+}
+
+.content-menu {
+  width: 100%;
+  background-color: white;
+  text-align: start;
+}
+
+.content-menu h1 {
+  width: 100%;
+  font-size: 20px;
+  text-align: start;
+  color: white;
+  background-color: #00866b;
+  font-weight: bold;
+  padding: 15px 20px;
+}
+
+.title {
+  font-size: 15px;
+  padding: 0px 20px;
+  font-weight: 600;
+  color: #028d4a;
+}
+
+.description {
+  width: 100%;
+  font-size: 12px;
+  padding: 0px 20px;
+  font-weight: 400;
+  color: rgb(127, 127, 127);
+}
+
+.action1 {
+  width: 30%;
+  padding: 20px 20px;
+  border: solid 2px #028d4a;
+  border-radius: 5px;
+  background: none;
+}
+
+.action1:hover {
+  background-color: rgb(221, 221, 221);
+  transition: 0.5s;
+}
+
+.content-after-draw {
+  padding: 0px 20px;
+}
+
+.content-after-draw button {
+  padding: 5px 5px;
+  background: transparent;
+  border: none;
+  font-size: 25px;
+  font-weight: bolder;
+}
+
+.content-after-draw button:hover {
+  background-color: rgb(221, 221, 221);
+  transition: 0.5s;
+}
+
+#menu2 h1 {
+  width: 100%;
+  font-size: 20px;
+  text-align: start;
+  color: white;
+  background-color: #00866b;
+  font-weight: bold;
+  padding: 15px 20px;
+}
+
+#menu2 .toggleData {
+  text-align: start;
+  width: 90%;
+  margin: auto;
+}
+
+#menu2 .form-check {
+  padding-top: 20px;
+}
+
+#menu2 .toggleData label {
+  display: block;
+}
+
+#menu2 .toggleData label:last-child {
+  font-size: 13px;
+  font-weight: 300;
+}
+
+.data-after-prosses {
+  width: 100%;
+  height: fit-content;
+  padding: 15px 20px;
+}
+
+.content-after-upload button {
+  padding: 5px 5px;
+  background: transparent;
+  border: none;
+  font-size: 25px;
+  font-weight: bolder;
+}
+
+.content-after-upload button:hover {
+  background-color: rgb(221, 221, 221);
+  transition: 0.5s;
+}
+
+#menu3 {
+  width: 400px;
+  background-color: #ffff;
+  color: #ffff;
+  height: fit-content;
+  text-align: start;
+}
+
+#menu3 h1 {
+  width: 100%;
+  font-size: 20px;
+  text-align: start;
+  color: white;
+  background-color: #00866b;
+  font-weight: bold;
+  padding: 15px 20px;
+}
+
+.descriptionRaster {
+  width: 100%;
+  font-size: 12px;
+  padding: 0px 15px;
+  font-weight: 400;
+  color: rgb(127, 127, 127);
+}
+
+.addRaster {
+  width: 30%;
+  padding: 20px 20px;
+  border: solid 2px #028d4a;
+  border-radius: 5px;
+  background: none;
+  margin-bottom: 10px;
+}
+
+#menu3 section {
+  background-color: #009376;
+  padding: 10px;
+}
+
+.menu-analisis {
+  padding-top: 10px;
+}
+
+.menu-analisis .souce {
+  font-size: 13px;
+  font-weight: 300;
+}
+
+#map {
+  background-color: #e8f5e9; /* Warna latar map (bisa diganti sesuai kebutuhan) */
+  width: 100%; /* Pastikan map mengisi kolomnya */
+  height: 100%; /* Pastikan map mengisi tinggi penuh */
+  position: relative;
+}
+
+.hidden {
+  display: none;
+}

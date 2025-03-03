@@ -1,0 +1,221 @@
+<div class="container"><%- include('layouts/nav') %></div>
+<div class="mapContent">
+  <div class="sidebar">
+    <div class="buttons">
+      <button class="menu-btn" data-target="menu1">Data Analyzer</button>
+      <button class="menu-btn" data-target="menu2">
+        <i class="bi bi-card-checklist"></i>
+        <p>Site Information</p>
+      </button>
+      <button class="menu-btn" data-target="menu3">
+        <i class="bi bi-card-checklist"></i>
+        <p>Analyze Raster</p>
+      </button>
+      </button>
+      <button class="menu-btn" data-target="menu4">
+        <i class="bi bi-card-checklist"></i>
+        <p>Site Information</p>
+      </button>
+      <button class="menu-btn" data-target="menu4">
+        <i class="bi bi-folder2-open"></i>
+        <p>Project Management</p>
+      </button>
+      </button>
+    </div>
+    <!-- Menu dropdown container -->
+    <div class="menu-container">
+      <div class="dropdown-menu custom-menu" id="menu1">
+        <div class="content-menu">
+          <h1>Data Analyzer</h1>
+          <div class="content-before-draw">
+            <p class="title">Analyze your current condition data</p>
+            <p class="description">
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta
+              illo illum modi vero itaque. Illum dolorum ratione inventore
+              consequatur! Natus consectetur sed maxime nostrum architecto.
+            </p>
+            <div class="container d-flex justify-content-center gap-3 mb-3">
+              <button class="action1" id="drawPolygonBtn">Draw Polygon</button>
+              <button class="action1" id="uploadShp">Upload SHP</button>
+            </div>
+          </div>
+          <div class="content-after-draw hidden">
+            <button class="rounded-pill" id="back-draw-btn">< Back</button>
+            <h1 class="mt-3">Started drawing polygon</h1>
+            <button id="btnAfterDraw">proses polygon</button>
+          </div>
+
+          <div class="content-after-upload hidden">
+            <button class="rounded-pill" id="btn-back-shp">< Back</button>
+            <div class="mb-3">
+              <label for="fileInput" class="form-label"
+                >Default file input example</label
+              >
+              <input class="form-control" type="file" id="fileInput" multiple />
+            </div>
+          </div>
+          <div class="data-after-prosses hidden">
+            <h1>Site Information</h1>
+            <div class="result"></div>
+          </div>
+        </div>
+      </div>
+      <div class="dropdown-menu custom-menu" id="menu2">
+        <h1>List of Data Spatial Layer</h1>
+        <div class="toggleData">
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="getBatasProvIdn"
+            />
+            <label class="form-check-label" for="flexSwitchCheckDefault"
+              >Batas Administrasi Provinsi Indonesia</label
+            >
+            <label class="souce" for="flexSwitchCheckDefault">2024, RBI BIG</label>
+          </div>
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="getNdbiLayer"
+            />
+            <label class="form-check-label" for="flexSwitchCheckChecked"
+              >Pemetaan Kerapatan Bangunan</label
+            >
+            <label class="souce" for="flexSwitchCheckChecked">2024, RBI BIG</label>
+          </div>
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="getRasterLayer"
+            />
+            <label class="form-check-label" for="flexSwitchCheckChecked"
+              >get Raster Layer</label
+            >
+            <label class="souce" for="flexSwitchCheckChecked">2024, RBI BIG</label>
+          </div>
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="getRasterLayer"
+            />
+            <label class="form-check-label" for="flexSwitchCheckChecked"
+              >get Raster Layer</label
+            >
+            <label class="souce" for="flexSwitchCheckChecked">2024, RBI BIG</label>
+          </div>
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="getRasterLayer"
+            />
+            <label class="form-check-label" for="flexSwitchCheckChecked"
+              >get Raster Layer</label
+            >
+            <label class="souce" for="flexSwitchCheckChecked">2024, RBI BIG</label>
+          </div>
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="getRasterLayer"
+            />
+            <label class="form-check-label" for="flexSwitchCheckChecked"
+              >get Raster Layer</label
+            >
+            <label class="souce" for="flexSwitchCheckChecked">2024, RBI BIG</label>
+          </div>
+        </div>
+      </div>
+      <div class="dropdown-menu custom-menu" id="menu3">
+        <h1>Analyze Your Raster Data</h1>
+        <p class="title">Analyze your current condition data</p>
+            <p class="descriptionRaster text-justify">
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta
+              illo illum modi vero itaque. Illum dolorum ratione inventore
+              consequatur! Natus consectetur sed maxime nostrum architecto.
+            </p>
+        <div class="d-flex justify-content-center ">
+          <button class="addRaster" id="uploadRaster">Upload Raster</button>
+          <input class="d-none" type="file" id="rasterInput" name="raster">
+        </div>
+        <section>
+          <div class="menu-analisis">
+            <h1>List of Analysis</h1>  
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="getNDVI"
+              />
+              <label class="form-check-label" for="flexSwitchCheckDefault"
+                >Normalized Difference Vegetation Index (NDVI)</label
+              >
+              <label class="souce" for="flexSwitchCheckDefault">2025, analisis ndvi</label>
+            </div>
+          </div>
+          <div class="menu-analisis">
+      
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="getNDBI"
+              />
+              <label class="form-check-label" for="flexSwitchCheckDefault"
+                >Normalized Difference Built-up Index (NDBI)</label
+              >
+              <label class="souce" for="flexSwitchCheckDefault">2025, analisis ndbi</label>
+            </div>
+          </div>
+        </section>
+        
+      </div>
+      <ul class="dropdown-menu custom-menu" id="menu4">
+        <li><a class="dropdown-item" href="#">Menu 4 - Action 1</a></li>
+        <li><a class="dropdown-item" href="#">Menu 4 - Action 2</a></li>
+        <li><a class="dropdown-item" href="#">Menu 4 - Action 3</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="map"></div>
+</div>
+
+<script>
+  const menuBtn = document.querySelectorAll(".menu-btn");
+  const menus = document.querySelectorAll(".custom-menu");
+
+  menuBtn.forEach((button) => {
+    button.addEventListener("click", () => {
+      // Tutup semua menu
+      menus.forEach((menu) => {
+        menu.classList.remove("show");
+      });
+
+      // Tampilkan menu yang sesuai
+      const targetMenu = document.getElementById(
+        button.getAttribute("data-target")
+      );
+      targetMenu.style.display = "block"; // Tampilkan agar animasi bekerja
+      setTimeout(() => {
+        targetMenu.classList.add("show");
+      }, 500); // Sedikit delay agar animasi berjalan dengan benar
+    });
+  });
+
+  // handle input raster
+
+</script>
