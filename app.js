@@ -9,6 +9,7 @@ const eksekusiPython = require("./utils/getAnalisis");
 const { processRasterTiles } = require("./map/handleRasterData");
 const { uploadRaster, getResultFilePaths } = require("./map/handleRasterData");
 const deleteFilesInDirectory = require("./map/handleDeleteDataUploads");
+const axios = require("ax");
 
 const prisma = new PrismaClient();
 
@@ -182,14 +183,15 @@ app.get("/upload", (req, res) => {
 });
 
 app.get("/resultAnalysis", async (req, res) => {
-  try {
-    const resultPath = await eksekusiPython(); // Tunggu hingga Python selesai
-    res.json({ rasterUserPath, analysisResult: resultPath });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error executing Python script", details: error });
-  }
+  // try {
+  //   const resultPath = await eksekusiPython(); // Tunggu hingga Python selesai
+  //   res.json({ rasterUserPath, analysisResult: resultPath });
+  // } catch (error) {
+  //   res
+  //     .status(500)
+  //     .json({ error: "Error executing Python script", details: error });
+  // }
+  // coba panggil api py
 });
 
 // app.get("/resultAnalysis", (req, res) => {
