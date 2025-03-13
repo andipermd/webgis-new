@@ -39,7 +39,8 @@ if response.status_code == 200:
     # Dapatkan transformasi dan CRS dari dataset asli
     crsAwal = raster.crs
     
-    # eksport output 
+    # eksport output
+     
     saveNdvi = rasterio.open('./uploads/result/classifiedNdvi.tif', 'w', driver='GTiff', width=raster.width, height=raster.height, count=1, transform=raster.transform, crs=crsAwal, bounds=raster.bounds, dtype=np.float32)
     
     saveNdvi.write(classifiedNdvi, 1)

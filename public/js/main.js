@@ -513,7 +513,7 @@ rasterInput.addEventListener("change", async function (event) {
 
   try {
     // Kirim file ke backend
-    const uploadResponse = await fetch("/upload", {
+    const uploadResponse = await fetch("/upload-raster", {
       method: "POST",
       body: formData,
     });
@@ -525,6 +525,10 @@ rasterInput.addEventListener("change", async function (event) {
     // jika berhasil di upload
     console.log("File berhasil diunggah!");
 
+    // const response = await fetch("/upload");
+    // const data = await response.json();
+    // console.log(data.analysisResult);
+    // loadRasterToMap(data.analysisResult, "NDVI");
     // pilih analisis
     //1. NDVI
     // Ambil elemen checkbox
@@ -532,17 +536,107 @@ rasterInput.addEventListener("change", async function (event) {
     const getNDBIbtn = document.getElementById("getNDBI");
 
     getNDVIbtn.addEventListener("change", async () => {
+      console.log("Tunggu minta data NDVI...");
+
       if (getNDVIbtn.checked) {
+        const cekResult = await fetch("/upload");
+        const cekDataResult = await cekResult.json();
+        const resultPath = cekDataResult.analysisResult;
+
         // ambil data path ndvi
-        console.log("Tunggu minta data NDVI...");
-        const response = await fetch("/resultAnalysis");
-        const data = await response.json();
-        loadRasterToMap(data.analysisResult, "NDVI");
+        if (resultPath.length === 0) {
+          const response = await fetch("/resultAnalysis");
+          const data = await response.json();
+          loadRasterToMap(data.filePath, "NDVI");
+        } else {
+          console.log(resultPath.length);
+          console.log(resultPath);
+          loadRasterToMap(resultPath, "NDVI");
+        }
       } else {
         console.log("Menghapus NDVI dari peta...");
         removeLayerFromMap("NDVI");
       }
     });
+
+    getNDBIbtn.addEventListener("change", async () => {
+      console.log("Tunggu minta data NDBI...");
+
+      if (getNDBIbtn.checked) {
+        const cekResult = await fetch("/upload");
+        const cekDataResult = await cekResult.json();
+        const resultPath = cekDataResult.analysisResult;
+
+        // ambil data path NDBI
+        if (resultPath.length === 0) {
+          const response = await fetch("/resultAnalysis");
+          const data = await response.json();
+          loadRasterToMap(data.filePath, "NDBI");
+        } else {
+          console.log(resultPath.length);
+          console.log(resultPath);
+          loadRasterToMap(resultPath, "NDBI");
+        }
+      } else {
+        console.log("Menghapus NDBI dari peta...");
+        removeLayerFromMap("NDBI");
+      }
+    });
+
+    // getNDBIbtn.addEventListener("change", async () => {
+    //   if (getNDIbtn.checked) {
+    //     const cekResult = await fetch("/upload");
+    //     const cekDataResult = await cekResult.json();
+    //     const resultPath = cekDataResult.analysisResult;
+    //     console.log(resultPath.length);
+
+    //     // // ambil data path ndvi
+    //     // if (resultPath.length === 0) {
+    //     //   const response = await fetch("/resultAnalysis");
+    //     //   const data = await response.json();
+    //     //   loadRasterToMap(data.filePath, "NDVI");
+    //     // } else {
+    //     //   console.log(resultPath.length);
+    //     //   console.log(resultPath);
+    //     //   loadRasterToMap(resultPath, "NDVI");
+    //     // }
+    //   }
+    // });
+
+    // getNDVIbtn.addEventListener("change", async () => {
+    //   if (getNDVIbtn.checked) {
+    //     console.log("Tunggu, minta data NDVI...");
+
+    //     try {
+    //       const response = await fetch("/resultAnalysis", {
+    //         method: "POST",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: JSON.stringify({
+    //           fileName: window.uploadedFileName,
+    //           analysisType: "NDVI",
+    //         }),
+    //       });
+
+    //       const data = await response.json();
+
+    //       if (response.ok) {
+    //         console.log("NDVI berhasil diproses:", data);
+    //         // loadRasterToMap(data.analysisResult, "NDVI"); // Tampilkan di Leaflet
+    //       } else {
+    //         console.error("Gagal mendapatkan NDVI:", data.error);
+    //         alert("Gagal memproses NDVI!");
+    //         getNDVIbtn.checked = false;
+    //       }
+    //     } catch (error) {
+    //       console.error("🔥 Error saat request NDVI:", error);
+    //       alert("Terjadi kesalahan saat meminta NDVI.");
+    //       getNDVIbtn.checked = false;
+    //     }
+    //   } else {
+    //     console.log("Menghapus NDVI dari peta...");
+    //     removeLayerFromMap("NDVI");
+    //   }
+    // });
 
     getNDBIbtn.addEventListener("change", () => {
       if (getNDBIbtn.checked) {
@@ -553,6 +647,30 @@ rasterInput.addEventListener("change", async function (event) {
     console.error("Error:", error);
   }
 });
+
+// getNDVIbtn.addEventListener("change", async () => {
+//   if (getNDVIbtn.checked) {
+//     // ambil data path ndvi
+//     console.log("Tunggu minta data NDVI...");
+//     const response = await fetch("/resultAnalysis");
+//     const data = await response.json();
+//     console.log(data);
+//     // loadRasterToMap(data.analysisResult, "NDVI");
+//   } else {
+//     console.log("Menghapus NDVI dari peta...");
+//     removeLayerFromMap("NDVI");
+//   }
+// });
+
+//     getNDBIbtn.addEventListener("change", () => {
+//       if (getNDBIbtn.checked) {
+//         console.log("minta NDBI nih");
+//       }
+//     });
+//   } catch (error) {
+//     console.error("Error:", error);
+//   }
+// });
 
 async function loadRasterToMap(path, type) {
   try {
@@ -580,18 +698,15 @@ async function loadRasterToMap(path, type) {
 
     if (type === "NDBI") {
       getColor = (value) => {
-        if (value >= 0 && value < 0.1) return "#FFFF99"; // Non-built-up
-        if (value >= 0.1 && value < 0.3) return "#FFA500"; // Peralihan
-        if (value >= 0.3) return "#8B0000"; // Bangunan padat
-        return "#000000"; // Lainnya
+        if (value >= 0 && value <= 1) return "#008000"; // Hijau (Vegetasi)
+        if (value > 1 && value <= 2) return "#ADFF2F"; // Hijau terang (Vegetasi jarang)
+        if (value > 2 && value <= 3) return "#DAA520"; // Coklat keemasan (Lahan terbuka)
+        if (value > 3 && value <= 4) return "#8B0000"; // Merah gelap (Area terbangun)
+        return "#000000"; // Hitam untuk nilai di luar range
       };
       legendTitle = "NDBI Klasifikasi";
-      legendLabels = [
-        "< 0.1 (Non-built-up)",
-        "0.1 - 0.3 (Peralihan)",
-        "> 0.3 (Bangunan padat)",
-      ];
-      legendColors = ["#FFFF99", "#FFA500", "#8B0000"];
+      legendLabels = ["0 - 1", "1 - 2", "2 - 3", "3 - 4"];
+      legendColors = ["#0000FF", "#FFFF00", "#7CFC00", "#FF0000"];
     }
 
     // Hapus layer sebelumnya jika ada

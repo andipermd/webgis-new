@@ -6,11 +6,15 @@ const methodOverride = require("method-override");
 const getDataByPolygon = require("./map/map.controller");
 const { PrismaClient } = require("@prisma/client");
 const eksekusiPython = require("./utils/getAnalisis");
-const { processRasterTiles } = require("./map/handleRasterData");
-const { uploadRaster, getResultFilePaths } = require("./map/handleRasterData");
+const { processRasterTiles } = require("./map/handleUploadRaster");
+const {
+  uploadRaster,
+  getResultFilePaths,
+} = require("./map/handleUploadRaster");
 const deleteFilesInDirectory = require("./map/handleDeleteDataUploads");
-const axios = require("ax");
-
+const axios = require("axios");
+const fs = require("fs");
+const FormData = require("form-data");
 const prisma = new PrismaClient();
 
 // server running
@@ -50,6 +54,7 @@ const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
 const { json } = require("stream/consumers");
 const { Cursor } = require("mongoose");
+const multer = require("multer");
 
 // const router = require('./map/map.controller')
 
@@ -182,39 +187,220 @@ app.get("/upload", (req, res) => {
   res.json({ rasterUserPath, analysisResult: resultPath });
 });
 
-app.get("/resultAnalysis", async (req, res) => {
-  // try {
-  //   const resultPath = await eksekusiPython(); // Tunggu hingga Python selesai
-  //   res.json({ rasterUserPath, analysisResult: resultPath });
-  // } catch (error) {
-  //   res
-  //     .status(500)
-  //     .json({ error: "Error executing Python script", details: error });
-  // }
-  // coba panggil api py
-});
+// // Rute untuk menangani upload file
+// app.post("/upload", uploadRaster.single("raster"), (req, res) => {
+//   // res.send(`File ${req.file.originalname} telah diunggah!`);
 
-// app.get("/resultAnalysis", (req, res) => {
-//   eksekusiPython();
-//   res.json({ rasterUserPath, analysisResult: resultPath });
+//   if (req.file) {
+//     const filePath = path.join("uploads/rasterImage", req.file.originalname);
+//     rasterUserPath.push(filePath); // Simpan path file dalam array
+
+//     res.json({
+//       message: `File ${req.file.originalname} telah diunggah!`,
+//       filePath: filePath,
+//     });
+//   } else {
+//     res.status(400).send("File tidak ditemukan.");
+//   }
 // });
 
-// Rute untuk menangani upload file
-app.post("/upload", uploadRaster.single("raster"), (req, res) => {
-  // res.send(`File ${req.file.originalname} telah diunggah!`);
+const upload = multer({ dest: "uploads/rasterImage" }); // Direktori penyimpanan tetap sama
 
-  if (req.file) {
-    const filePath = path.join("uploads/rasterImage", req.file.originalname);
-    rasterUserPath.push(filePath); // Simpan path file dalam array
+app.post("/upload-raster", upload.single("raster"), (req, res) => {
+  try {
+    // Ubah path menjadi relatif
+    const relativePath = path.relative(process.cwd(), req.file.path);
+    rasterUserPath.push(relativePath); // Simpan path relatif
+
+    console.log("📂 File diunggah:", relativePath);
+    console.log("📌 Semua rasterUserPath:", rasterUserPath);
 
     res.json({
-      message: `File ${req.file.originalname} telah diunggah!`,
-      filePath: filePath,
+      message: "File uploaded successfully",
+      filePath: relativePath, // Path relatif yang dikembalikan ke frontend
     });
-  } else {
-    res.status(400).send("File tidak ditemukan.");
+  } catch (error) {
+    console.error("🔥 Error saat menyimpan file:", error);
+    res.status(500).json({ error: "Gagal menyimpan raster" });
   }
 });
+
+app.get("/resultAnalysis", async (req, res) => {
+  try {
+    if (rasterUserPath.length === 0) {
+      return res.status(400).json({ error: "Tidak ada file yang diunggah" });
+    }
+
+    // Ambil path terakhir dan ubah menjadi absolut
+    const relativePath = rasterUserPath.pop();
+    const filePath = path.resolve(relativePath);
+
+    if (!fs.existsSync(filePath)) {
+      console.error("🚨 File tidak ditemukan:", filePath);
+      return res.status(400).json({ error: "File tidak ditemukan" });
+    }
+
+    console.log("📤 Mengirim file ke FastAPI:", filePath);
+
+    // Kirim ke FastAPI
+    const formData = new FormData();
+    formData.append("file", fs.createReadStream(filePath));
+
+    const response = await axios.post(
+      "https://diplomatic-learning-production.up.railway.app/process-raster-ndvi",
+      formData,
+      {
+        responseType: "arraybuffer",
+        headers: formData.getHeaders(),
+      }
+    );
+
+    // Simpan hasil di /uploads/result/
+    const resultDir = path.join("uploads", "result");
+    if (!fs.existsSync(resultDir)) fs.mkdirSync(resultDir, { recursive: true });
+
+    const resultPath = path.join(resultDir, "classified_ndvi.tif");
+    fs.writeFileSync(resultPath, response.data);
+
+    console.log("✅ NDVI processed:", resultPath);
+
+    // // Hapus file asli setelah diproses
+    // fs.unlinkSync(filePath);
+
+    res.json({
+      message: "NDVI processed successfully",
+      filePath: `./${resultPath}`, // Kirim path relatif kembali ke frontend
+    });
+  } catch (error) {
+    console.error("🔥 Error di resultAnalysis:", error);
+    res.status(500).json({ error: "Gagal memproses raster" });
+  }
+});
+
+app.get("/resultAnalysisNdbi", async (req, res) => {
+  try {
+    if (rasterUserPath.length === 0) {
+      return res.status(400).json({ error: "Tidak ada file yang diunggah" });
+    }
+
+    // Ambil path terakhir dan ubah menjadi absolut
+    const relativePath = rasterUserPath.pop();
+    const filePath = path.resolve(relativePath);
+
+    if (!fs.existsSync(filePath)) {
+      console.error("🚨 File tidak ditemukan:", filePath);
+      return res.status(400).json({ error: "File tidak ditemukan" });
+    }
+
+    console.log("📤 Mengirim file ke FastAPI:", filePath);
+
+    // Kirim ke FastAPI
+    const formData = new FormData();
+    formData.append("file", fs.createReadStream(filePath));
+
+    const response = await axios.post(
+      "https://diplomatic-learning-production.up.railway.app/process-raster-ndbi",
+      formData,
+      {
+        responseType: "arraybuffer",
+        headers: formData.getHeaders(),
+      }
+    );
+
+    // Simpan hasil di /uploads/result/
+    const resultDir = path.join("uploads", "result");
+    if (!fs.existsSync(resultDir)) fs.mkdirSync(resultDir, { recursive: true });
+
+    const resultPath = path.join(resultDir, "classified_ndbi.tif");
+    fs.writeFileSync(resultPath, response.data);
+
+    console.log("✅ NDBI processed:", resultPath);
+
+    // // Hapus file asli setelah diproses
+    // fs.unlinkSync(filePath);
+
+    res.json({
+      message: "NDBI processed successfully",
+      filePath: `./${resultPath}`, // Kirim path relatif kembali ke frontend
+    });
+  } catch (error) {
+    console.error("🔥 Error di resultAnalysis:", error);
+    res.status(500).json({ error: "Gagal memproses raster" });
+  }
+});
+
+// app.post("/resultAnalysis", async (req, res) => {
+//   try {
+//     console.log("Request Body:", req.body);
+//     const { analysisType } = req.body;
+
+//     if (!analysisType) {
+//       return res.status(400).json({ error: "analysisType diperlukan!" });
+//     }
+
+//     // Ambil file raster terbaru dari folder uploads/rasterImage
+//     const rasterDir = path.join(__dirname, "uploads", "rasterImage");
+//     const files = fs.readdirSync(rasterDir);
+//     if (files.length === 0) {
+//       return res
+//         .status(404)
+//         .json({ error: "Tidak ada file raster yang diupload" });
+//     }
+
+//     const latestFile = files[0]; // Ambil file pertama (atau buat logika pemilihan file yang lebih baik)
+//     const filePath = path.join(rasterDir, latestFile);
+
+//     console.log(
+//       `Menggunakan file raster: ${latestFile} untuk analisis ${analysisType}`
+//     );
+
+//     // Kirim request ke FastAPI dengan filePath dan analysisType
+//     const response = await axios.post(
+//       "http://127.0.0.1:8000/process-raster",
+//       { filePath, analysisType },
+//       { headers: { "Content-Type": "application/json" } }
+//     );
+
+//     // Simpan hasil analisis
+//     const resultDir = path.join(__dirname, "uploads", "result");
+//     if (!fs.existsSync(resultDir)) fs.mkdirSync(resultDir, { recursive: true });
+
+//     const resultPath = path.join(resultDir, `${analysisType}_${latestFile}`);
+//     fs.writeFileSync(resultPath, response.data);
+
+//     res.json({
+//       message: `Analisis ${analysisType} berhasil`,
+//       filePath: `/uploads/result/${analysisType}_${latestFile}`,
+//     });
+//   } catch (error) {
+//     console.error("🔥 Error saat analisis raster:", error);
+//     res.status(500).json({ error: "Gagal memproses analisis" });
+//   }
+// });
+
+// app.post("/upload-raster", upload.single("raster"), async (req, res) => {
+//   try {
+//     const filePath = req.file.path;
+
+//     const formData = new FormData();
+//     formData.append("file", fs.createReadStream(filePath));
+
+//     const headers = formData.getHeaders();
+
+//     const response = await axios.post(
+//       "http://127.0.0.1:8000/process-raster",
+//       formData,
+//       { headers }
+//     );
+
+//     fs.unlinkSync(filePath);
+
+//     res.json(response.data);
+//   } catch (error) {
+//     console.error("🔥 Error di Backend Node.js:", error);
+//     res.status(500).json({ error: "Terjadi kesalahan di server" });
+//   }
+// });
 
 // Halaman projek
 app.get("/projek", (req, res) => {
