@@ -132,6 +132,15 @@ app.get("/shpUser", async (req, res) => {
   res.json(currentPolygonUser);
 });
 
+app.get("/db-test", async (req, res) => {
+  try {
+    const result = await prisma.$queryRaw`SELECT 1`;
+    res.json({ success: true, result });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.get("/product/batasAdministrasi", async (req, res) => {
   try {
     // Query ke database untuk mengambil data geom dan provinsi
