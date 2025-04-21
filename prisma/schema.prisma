@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = url = "postgresql://postgres:andipermadi@db.ympxoggbzurlydzbrtyi.supabase.co:5432/spasialdb?sslmode=require"
+  url      = "postgresql://postgres:andipermadi@db.ympxoggbzurlydzbrtyi.supabase.co:5432/spasialdb?sslmode=require"
 
 }
 
