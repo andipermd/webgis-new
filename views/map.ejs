@@ -138,19 +138,24 @@
         </div>
       </div>
       <div class="dropdown-menu custom-menu" id="menu3">
+        <main>
         <h1>Analyze Your Raster Data</h1>
-        <p class="title">Analyze your current condition data</p>
-            <p class="descriptionRaster text-justify">
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta
-              illo illum modi vero itaque. Illum dolorum ratione inventore
-              consequatur! Natus consectetur sed maxime nostrum architecto.
-            </p>
-        <div class="d-flex justify-content-center ">
-          <button class="addRaster" id="uploadRaster">Upload Raster</button>
-          <input class="d-none" type="file" id="rasterInput" name="raster">
-        </div>
-        <section>
+          <p class="title">Analyze your current condition data</p>
+              <p class="descriptionRaster text-justify">
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dicta
+                illo illum modi vero itaque. Illum dolorum ratione inventore
+                consequatur! Natus consectetur sed maxime nostrum architecto.
+              </p>
+          <div class="d-flex justify-content-center ">
+            <button class="addRaster" id="uploadRaster">Upload Raster</button>
+            <input class="d-none" type="file" id="rasterInput" name="raster">
+            
+          </div>
+        </main>
+        
+        <section class="hidden">
           <div class="menu-analisis">
+            <button class="mb-3">< Back</button>
             <h1>List of Analysis</h1>  
             <div class="form-check form-switch">
               <input
@@ -180,6 +185,7 @@
               <label class="souce" for="flexSwitchCheckDefault">2025, analisis ndbi</label>
             </div>
           </div>
+         
         </section>
         
       </div>
@@ -191,6 +197,7 @@
     </div>
   </div>
 
+  <div class="loader hidden"></div>
   <div id="map"></div>
 </div>
 

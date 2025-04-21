@@ -404,6 +404,7 @@ function addGeometryToMap(shpGeom) {
 
 // List of Data Spatial Layer
 
+const menu2 = document.getElementById("menu2");
 // Ambil elemen checkbox
 const btnBatasProv = document.getElementById("getBatasProvIdn");
 const btnGetNdbi = document.getElementById("getNdbiLayer");
@@ -415,10 +416,12 @@ let layers = {};
 btnBatasProv.addEventListener("change", () => {
   if (btnBatasProv.checked) {
     if (!layers.batasProv) {
+      showLoader("#menu2");
       console.log("Meminta data batas provinsi sekarang");
       fetch("/product/batasAdministrasi")
         .then((response) => response.json())
         .then((data) => {
+          hideLoader("#menu2");
           layers.batasProv = L.geoJSON(data).addTo(map);
           console.log("Data batas provinsi ditambahkan", data);
         })
@@ -426,6 +429,7 @@ btnBatasProv.addEventListener("change", () => {
     }
   } else {
     if (layers.batasProv) {
+      hideLoader("#menu2");
       map.removeLayer(layers.batasProv);
       delete layers.batasProv;
       console.log("Data batas provinsi dihapus dari peta.");
@@ -488,6 +492,9 @@ btnGetNdbi.addEventListener("change", () => {
 // analisis raster image
 const uploadRaster = document.getElementById("uploadRaster");
 const rasterInput = document.getElementById("rasterInput");
+const wrapMenu3Section = document.querySelector("#menu3 section");
+const wrapMenu3Main = document.querySelector("#menu3 main");
+const loader = document.querySelector(".loader");
 
 uploadRaster.addEventListener("click", function () {
   rasterInput.click();
@@ -513,6 +520,8 @@ rasterInput.addEventListener("change", async function (event) {
 
   try {
     // Kirim file ke backend
+    showLoader("#menu3 main");
+
     const uploadResponse = await fetch("/upload-raster", {
       method: "POST",
       body: formData,
@@ -524,16 +533,35 @@ rasterInput.addEventListener("change", async function (event) {
 
     // jika berhasil di upload
     console.log("File berhasil diunggah!");
+    hideLoader("#menu3 main");
+    wrapMenu3Section.classList.remove("hidden");
+    wrapMenu3Main.classList.add("hidden");
 
-    // const response = await fetch("/upload");
-    // const data = await response.json();
-    // console.log(data.analysisResult);
-    // loadRasterToMap(data.analysisResult, "NDVI");
     // pilih analisis
     //1. NDVI
     // Ambil elemen checkbox
     const getNDVIbtn = document.getElementById("getNDVI");
     const getNDBIbtn = document.getElementById("getNDBI");
+    const backToUpload = document.querySelector(".menu-analisis button");
+
+    backToUpload.addEventListener("click", async function () {
+      try {
+        const response = await fetch("/upload", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.ok) {
+          throw new Error("Gagal menghapus area.");
+        }
+
+        // Setelah DELETE berhasil (atau tidak ada currentGeomShp), lanjut
+        wrapMenu3Main.classList.remove("hidden");
+        wrapMenu3Section.classList.add("hidden");
+      } catch (error) {
+        console.error("🔥 Error saat backToUpload:", error);
+      }
+    });
 
     getNDVIbtn.addEventListener("change", async () => {
       console.log("Tunggu minta data NDVI...");
@@ -545,8 +573,10 @@ rasterInput.addEventListener("change", async function (event) {
 
         // ambil data path ndvi
         if (resultPath.length === 0) {
+          showLoader("#menu3 section");
           const response = await fetch("/resultAnalysis");
           const data = await response.json();
+          hideLoader("#menu3 section");
           loadRasterToMap(data.filePath, "NDVI");
         } else {
           console.log(resultPath.length);
@@ -569,8 +599,10 @@ rasterInput.addEventListener("change", async function (event) {
 
         // ambil data path NDBI
         if (resultPath.length === 0) {
+          showLoader("#menu3 section");
           const response = await fetch("/resultAnalysis");
           const data = await response.json();
+          hideLoader("#menu3 section");
           loadRasterToMap(data.filePath, "NDBI");
         } else {
           console.log(resultPath.length);
@@ -583,61 +615,6 @@ rasterInput.addEventListener("change", async function (event) {
       }
     });
 
-    // getNDBIbtn.addEventListener("change", async () => {
-    //   if (getNDIbtn.checked) {
-    //     const cekResult = await fetch("/upload");
-    //     const cekDataResult = await cekResult.json();
-    //     const resultPath = cekDataResult.analysisResult;
-    //     console.log(resultPath.length);
-
-    //     // // ambil data path ndvi
-    //     // if (resultPath.length === 0) {
-    //     //   const response = await fetch("/resultAnalysis");
-    //     //   const data = await response.json();
-    //     //   loadRasterToMap(data.filePath, "NDVI");
-    //     // } else {
-    //     //   console.log(resultPath.length);
-    //     //   console.log(resultPath);
-    //     //   loadRasterToMap(resultPath, "NDVI");
-    //     // }
-    //   }
-    // });
-
-    // getNDVIbtn.addEventListener("change", async () => {
-    //   if (getNDVIbtn.checked) {
-    //     console.log("Tunggu, minta data NDVI...");
-
-    //     try {
-    //       const response = await fetch("/resultAnalysis", {
-    //         method: "POST",
-    //         headers: { "Content-Type": "application/json" },
-    //         body: JSON.stringify({
-    //           fileName: window.uploadedFileName,
-    //           analysisType: "NDVI",
-    //         }),
-    //       });
-
-    //       const data = await response.json();
-
-    //       if (response.ok) {
-    //         console.log("NDVI berhasil diproses:", data);
-    //         // loadRasterToMap(data.analysisResult, "NDVI"); // Tampilkan di Leaflet
-    //       } else {
-    //         console.error("Gagal mendapatkan NDVI:", data.error);
-    //         alert("Gagal memproses NDVI!");
-    //         getNDVIbtn.checked = false;
-    //       }
-    //     } catch (error) {
-    //       console.error("🔥 Error saat request NDVI:", error);
-    //       alert("Terjadi kesalahan saat meminta NDVI.");
-    //       getNDVIbtn.checked = false;
-    //     }
-    //   } else {
-    //     console.log("Menghapus NDVI dari peta...");
-    //     removeLayerFromMap("NDVI");
-    //   }
-    // });
-
     getNDBIbtn.addEventListener("change", () => {
       if (getNDBIbtn.checked) {
         console.log("minta NDBI nih");
@@ -647,30 +624,6 @@ rasterInput.addEventListener("change", async function (event) {
     console.error("Error:", error);
   }
 });
-
-// getNDVIbtn.addEventListener("change", async () => {
-//   if (getNDVIbtn.checked) {
-//     // ambil data path ndvi
-//     console.log("Tunggu minta data NDVI...");
-//     const response = await fetch("/resultAnalysis");
-//     const data = await response.json();
-//     console.log(data);
-//     // loadRasterToMap(data.analysisResult, "NDVI");
-//   } else {
-//     console.log("Menghapus NDVI dari peta...");
-//     removeLayerFromMap("NDVI");
-//   }
-// });
-
-//     getNDBIbtn.addEventListener("change", () => {
-//       if (getNDBIbtn.checked) {
-//         console.log("minta NDBI nih");
-//       }
-//     });
-//   } catch (error) {
-//     console.error("Error:", error);
-//   }
-// });
 
 async function loadRasterToMap(path, type) {
   try {
@@ -842,4 +795,27 @@ function loadNDVIToMap(path) {
       });
     })
     .catch((error) => console.error("Error loading raster:", error));
+}
+
+// loader animation
+
+function showLoader(targetSelector) {
+  const target = document.querySelector(targetSelector);
+  if (!target) return;
+
+  // Cek apakah loader sudah ada
+  let loader = target.querySelector(".loader");
+  if (!loader) {
+    loader = document.createElement("div");
+    loader.className = "loader";
+    target.appendChild(loader);
+  }
+
+  loader.classList.remove("hidden");
+}
+
+function hideLoader(targetSelector) {
+  const target = document.querySelector(targetSelector);
+  const loader = target?.querySelector(".loader");
+  if (loader) loader.classList.add("hidden");
 }

@@ -35,3 +35,43 @@ model spatial_ref_sys {
   srtext    String? @db.VarChar(2048)
   proj4text String? @db.VarChar(2048)
 }
+
+model geo_area {
+  id        Int                      @id @default(autoincrement())
+  category  String?                  @db.VarChar(300)
+  area_name String?                  @db.VarChar(100)
+  geom      Unsupported("geometry")?
+
+  @@index([geom], type: Gist)
+}
+
+model geo_line {
+  id        Int                      @id @default(autoincrement())
+  category  String?                  @db.VarChar(300)
+  road_name String?                  @db.VarChar(100)
+  geom      Unsupported("geometry")?
+
+  @@index([geom], type: Gist)
+}
+
+model geo_point {
+  id         Int                      @id @default(autoincrement())
+  category   String?                  @db.VarChar(300)
+  point_name String?                  @db.VarChar(100)
+  addres     String?                  @db.VarChar(300)
+  geom       Unsupported("geometry")?
+
+  @@index([geom], type: Gist)
+}
+
+model hasilndbi1 {
+  id         Int                      @id @default(autoincrement())
+  geom       Unsupported("geometry")?
+  objectid   BigInt?
+  gridcode   BigInt?
+  shape_leng Float?
+  shape_area Float?
+  ndbi       String?                  @db.VarChar(50)
+
+  @@index([geom], map: "sidx_hasilndbi1_geom", type: Gist)
+}

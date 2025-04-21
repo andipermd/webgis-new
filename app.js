@@ -6,7 +6,6 @@ const methodOverride = require("method-override");
 const getDataByPolygon = require("./map/map.controller");
 const { PrismaClient } = require("@prisma/client");
 const eksekusiPython = require("./utils/getAnalisis");
-const { processRasterTiles } = require("./map/handleUploadRaster");
 const {
   uploadRaster,
   getResultFilePaths,
@@ -187,22 +186,13 @@ app.get("/upload", (req, res) => {
   res.json({ rasterUserPath, analysisResult: resultPath });
 });
 
-// // Rute untuk menangani upload file
-// app.post("/upload", uploadRaster.single("raster"), (req, res) => {
-//   // res.send(`File ${req.file.originalname} telah diunggah!`);
-
-//   if (req.file) {
-//     const filePath = path.join("uploads/rasterImage", req.file.originalname);
-//     rasterUserPath.push(filePath); // Simpan path file dalam array
-
-//     res.json({
-//       message: `File ${req.file.originalname} telah diunggah!`,
-//       filePath: filePath,
-//     });
-//   } else {
-//     res.status(400).send("File tidak ditemukan.");
-//   }
-// });
+app.delete("/upload", (req, res) => {
+  rasterUserPath = [];
+  resultPath = [];
+  deleteFilesInDirectory("uploads/rasterImage");
+  deleteFilesInDirectory("uploads/result");
+  res.json({ message: "Data berhasil dihapus." }); // ⬅️ Tambahan penting
+});
 
 const upload = multer({ dest: "uploads/rasterImage" }); // Direktori penyimpanan tetap sama
 
