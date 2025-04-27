@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "build": "npx prisma generate",
+    "build": "prisma generate",
     "start": "node app.js",
     "dev": "node app.js"
   },
