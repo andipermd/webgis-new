@@ -35,7 +35,7 @@ app.use(methodOverride("_method"));
 const path = require("path");
 
 app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "./public")));
 app.set("view engine", "ejs");
 app.use(expressLayouts);
 app.set("layout", "layouts/main-layout");
@@ -199,7 +199,7 @@ app.delete("/upload", (req, res) => {
   res.json({ message: "Data berhasil dihapus." }); // ⬅️ Tambahan penting
 });
 
-const upload = multer({ dest: "/tmp/rasterImage" }); // Gunakan /tmp sebagai direktori sementara
+const upload = multer({ dest: "uploads/rasterImage" }); // Direktori penyimpanan tetap sama
 
 app.post("/upload-raster", upload.single("raster"), (req, res) => {
   try {
