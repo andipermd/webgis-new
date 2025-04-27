@@ -5,7 +5,7 @@ const expressLayouts = require("express-ejs-layouts");
 const methodOverride = require("method-override");
 const getDataByPolygon = require("./map/map.controller");
 const { PrismaClient } = require("@prisma/client");
-const eksekusiPython = require("./utils/getAnalisis");
+
 const {
   uploadRaster,
   getResultFilePaths,
