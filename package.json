@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "build": "prisma generate",
     "start": "node app.js",
-    "dev": "node app.js"
+    "dev": "node app.js",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
