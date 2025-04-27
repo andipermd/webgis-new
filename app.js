@@ -199,7 +199,7 @@ app.delete("/upload", (req, res) => {
   res.json({ message: "Data berhasil dihapus." }); // ⬅️ Tambahan penting
 });
 
-const upload = multer({ dest: "uploads/rasterImage" }); // Direktori penyimpanan tetap sama
+const upload = multer({ dest: "/tmp/rasterImage" }); // Gunakan /tmp sebagai direktori sementara
 
 app.post("/upload-raster", upload.single("raster"), (req, res) => {
   try {
