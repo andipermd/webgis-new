@@ -48,11 +48,7 @@ app.use("/uploads", express.static("uploads"));
 app.use(express.urlencoded({ extended: true }));
 
 //FLASH DLL
-const session = require("express-session");
-const cookieParser = require("cookie-parser");
-const flash = require("connect-flash");
-const { json } = require("stream/consumers");
-const { Cursor } = require("mongoose");
+
 const multer = require("multer");
 
 // const router = require('./map/map.controller')
