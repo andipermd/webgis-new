@@ -35,8 +35,8 @@ app.use(methodOverride("_method"));
 const path = require("path");
 
 app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, "./public")));
-app.use(express.static(path.join(__dirname, "./uploads")));
+app.use(express.static(path.join(__dirname, "/public")));
+app.use("/tmp", express.static("/tmp"));
 app.set("view engine", "ejs");
 app.use(expressLayouts);
 app.set("layout", "layouts/main-layout");
@@ -76,8 +76,8 @@ app.get("/map", (req, res) => {
     resultPath = [];
 
     // menghapus file raster user
-    deleteFilesInDirectory("uploads/rasterImage");
-    deleteFilesInDirectory("uploads/result");
+    deleteFilesInDirectory("/tmp/rasterImage");
+    deleteFilesInDirectory("/tmp/result");
 
     currentPolygonUser = [];
     dataClipUser = [];
@@ -192,28 +192,37 @@ app.get("/upload", (req, res) => {
   res.json({ rasterUserPath, analysisResult: resultPath });
 });
 
-app.delete("/upload", (req, res) => {
-  rasterUserPath = [];
-  resultPath = [];
-  deleteFilesInDirectory("uploads/rasterImage");
-  deleteFilesInDirectory("uploads/result");
-  res.json({ message: "Data berhasil dihapus." }); // ⬅️ Tambahan penting
+app.delete("/upload", async (req, res) => {
+  try {
+    // Reset data array untuk file path
+    rasterUserPath = [];
+    resultPath = [];
+
+    // Hapus file dalam direktori rasterImage dan result
+    await deleteFilesInDirectory("/tmp/rasterImage");
+    await deleteFilesInDirectory("/tmp/result");
+
+    res.json({ message: "Data berhasil dihapus." });
+  } catch (error) {
+    console.error("🔥 Error menghapus file:", error);
+    res.status(500).json({ error: "Gagal menghapus data." });
+  }
 });
 
-const upload = multer({ dest: "uploads/rasterImage" }); // Direktori penyimpanan tetap sama
+const upload = multer({ dest: "/tmp/rasterImage" }); // Gunakan /tmp sebagai direktori sementara
 
 app.post("/upload-raster", upload.single("raster"), (req, res) => {
   try {
-    // Ubah path menjadi relatif
-    const relativePath = path.relative(process.cwd(), req.file.path);
-    rasterUserPath.push(relativePath); // Simpan path relatif
+    // Langsung pakai path absolute
+    const uploadedPath = req.file.path;
+    rasterUserPath.push(uploadedPath);
 
-    console.log("📂 File diunggah:", relativePath);
+    console.log("📂 File diunggah:", uploadedPath);
     console.log("📌 Semua rasterUserPath:", rasterUserPath);
 
     res.json({
       message: "File uploaded successfully",
-      filePath: relativePath, // Path relatif yang dikembalikan ke frontend
+      filePath: uploadedPath, // Path absolute dikembalikan
     });
   } catch (error) {
     console.error("🔥 Error saat menyimpan file:", error);
@@ -223,22 +232,12 @@ app.post("/upload-raster", upload.single("raster"), (req, res) => {
 
 app.get("/resultAnalysis", async (req, res) => {
   try {
-    if (rasterUserPath.length === 0) {
-      return res.status(400).json({ error: "Tidak ada file yang diunggah" });
-    }
-
-    // Ambil path terakhir dan ubah menjadi absolut
-    const relativePath = rasterUserPath.pop();
-    const filePath = path.resolve(relativePath);
-
-    if (!fs.existsSync(filePath)) {
-      console.error("🚨 File tidak ditemukan:", filePath);
-      return res.status(400).json({ error: "File tidak ditemukan" });
-    }
+    // Ambil path terakhir (sudah absolute) TANPA ubah
+    const filePath = rasterUserPath.pop();
 
     console.log("📤 Mengirim file ke FastAPI:", filePath);
 
-    // Kirim ke FastAPI
+    // Kirim file ke FastAPI
     const formData = new FormData();
     formData.append("file", fs.createReadStream(filePath));
 
@@ -246,26 +245,28 @@ app.get("/resultAnalysis", async (req, res) => {
       "https://diplomatic-learning-production.up.railway.app/process-raster-ndvi",
       formData,
       {
-        responseType: "arraybuffer",
+        responseType: "arraybuffer", // karena akan dapat file biner (GeoTIFF)
         headers: formData.getHeaders(),
       }
     );
 
-    // Simpan hasil di /uploads/result/
-    const resultDir = path.join("uploads", "result");
-    if (!fs.existsSync(resultDir)) fs.mkdirSync(resultDir, { recursive: true });
+    // Simpan hasil ke /tmp/result/
+    const resultDir = path.join("/tmp", "result");
+    if (!fs.existsSync(resultDir)) {
+      fs.mkdirSync(resultDir, { recursive: true });
+    }
 
     const resultPath = path.join(resultDir, "classified_ndvi.tif");
     fs.writeFileSync(resultPath, response.data);
 
-    console.log("✅ NDVI processed:", resultPath);
+    console.log("✅ NDVI processed dan disimpan:", resultPath);
 
-    // // Hapus file asli setelah diproses
+    // Opsional: hapus file upload original setelah diproses
     // fs.unlinkSync(filePath);
 
     res.json({
       message: "NDVI processed successfully",
-      filePath: `./${resultPath}`, // Kirim path relatif kembali ke frontend
+      filePath: "/tmp/result/classified_ndvi.tif", // Path ABSOLUTE (bukan relatif)
     });
   } catch (error) {
     console.error("🔥 Error di resultAnalysis:", error);
@@ -322,6 +323,21 @@ app.get("/resultAnalysisNdbi", async (req, res) => {
   } catch (error) {
     console.error("🔥 Error di resultAnalysis:", error);
     res.status(500).json({ error: "Gagal memproses raster" });
+  }
+});
+
+// Endpoint baru
+app.get("/download-result", (req, res) => {
+  if (resultPath.length === 0) {
+    return res.status(404).json({ error: "Belum ada hasil analisis" });
+  }
+
+  const resultPathAnalysis = resultPath[0];
+
+  if (fs.existsSync(resultPathAnalysis)) {
+    res.sendFile(resultPathAnalysis);
+  } else {
+    res.status(404).json({ error: "File NDVI tidak ditemukan" });
   }
 });
 

@@ -571,14 +571,20 @@ rasterInput.addEventListener("change", async function (event) {
         const cekDataResult = await cekResult.json();
         const resultPath = cekDataResult.analysisResult;
 
-        // ambil data path ndvi
+        // ambil data path ndvi, jika belum request
         if (resultPath.length === 0) {
           showLoader("#menu3 section");
+
           const response = await fetch("/resultAnalysis");
           const data = await response.json();
+          console.log(data);
+
           hideLoader("#menu3 section");
+
+          // ganti filePath menjadi URL baru
           loadRasterToMap(data.filePath, "NDVI");
         } else {
+          // jika sudah pernah request
           console.log(resultPath.length);
           console.log(resultPath);
           loadRasterToMap(resultPath, "NDVI");
